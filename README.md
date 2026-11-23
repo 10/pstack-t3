@@ -1,11 +1,11 @@
 # pstack for T3 Code
 
-pstack is an engineering skill library for coding agents. Lauren Tan ([poteto](https://x.com/poteto)) wrote it for Cursor: one mode skill that routes every task to a playbook, principles that ground each decision, and verification strict enough to parallelize with confidence. This repo ships it to [T3 Code](https://github.com/pingdotgg/t3code) as 52 skills that work in Claude Code and Codex threads alike, with every delegation running as a T3 child on the model you picked for that role.
+pstack is an engineering skill library for coding agents. Lauren Tan ([poteto](https://x.com/poteto)) wrote it for Cursor: one mode skill that routes every task to a playbook, principles that ground each decision, and verification strict enough to parallelize with confidence. This repo ships it to [T3 Code](https://github.com/pingdotgg/t3code) as 59 skills that work in Claude Code and Codex threads alike, with every delegation running as a T3 child on the model you picked for that role.
 
 ## Install
 
 ```bash
-npx skills add mariusflorescu/pstack-t3 -g -a claude-code -a codex
+npx skills add 10/pstack-t3 -g -a claude-code -a codex
 ```
 
 This puts one copy of each skill in `~/.agents/skills/` (Codex reads it there) and a symlink in `~/.claude/skills/` (Claude Code reads it there). Update with `npx skills update -g`. Drop `-g` to install into a single project instead, but install one way or the other, not both: when a skill name exists in both `~/.agents/skills` and a project's `.agents/skills`, Codex resolves neither on `$<name>`.
@@ -15,7 +15,7 @@ You also need `gh` (the only forge pstack uses) and [Bun](https://bun.sh) for th
 ## Get started
 
 1. Run `/setup-pstack`. It reads the providers and models T3 offers (`orchestrator_capabilities`), asks for a reasoning budget, and writes `~/.config/pstack/pstack-models.md`: one `role: provider/model (effort)` line per pstack role.
-2. Use `/poteto-mode` for anything that needs rigor. It picks one of 23 playbooks and runs the other skills as the steps need them.
+2. Use `/poteto-mode` for anything that needs rigor. It picks one of 22 playbooks and runs the other skills as the steps need them.
 3. Stuck, or unsure which skill fits? Ask `/poteto-help`.
 
 Codex threads run every skill as `$<name>` where this README and the skills write `/<name>`.
@@ -42,7 +42,7 @@ Codex threads run every skill as `$<name>` where this README and the skills writ
 | `/in-your-own-words` | You want the agent to play back your goal and the problem before it starts. |
 | `/sharpen` | You want a prompt rewritten deeper, not bigger, before you send it. It returns the prompt and doesn't do the task. |
 | `/how` | You want a walkthrough of how a subsystem works. |
-| `/why` | You want to know why something was built this way, from every evidence source your MCP tools reach. |
+| `/why` | You want to know why something was built this way, from the commits and PR discussions that explain the decision. |
 | `/recall` | You're starting or resuming work and want your recent context rebuilt from your own threads. |
 | `/ketchup` | You want what changed in this chat since your last message, in a few plain sentences and small visuals, with just enough context on each action item to make the call. |
 | `/ketchup-video` | You want a `/ketchup` catch-up as a short silent video of slides, with the waiting calls as text under it. |
@@ -88,7 +88,7 @@ The 24 `principle-*` skills are indexed inside `poteto-mode` and read by the oth
 
 ## Credit
 
-Adapted from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) by [Lauren Tan](https://x.com/poteto). `skills/deslop` comes from cursor/plugins `cursor-team-kit`. This port is not affiliated with Cursor or with the pstack author.
+Forked from [Marius Florescu’s T3 port](https://github.com/mariusflorescu/pstack-t3). Adapted from [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) by [Lauren Tan](https://x.com/poteto). `skills/deslop` comes from cursor/plugins `cursor-team-kit`. This port is not affiliated with Cursor or with the pstack author.
 
 ## License
 

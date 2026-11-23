@@ -6,7 +6,7 @@ Keep upstream wording wherever it is harness-neutral. Change only what names a C
 
 ## What reaches an agent
 
-`npx skills add mariusflorescu/pstack-t3 -g -a claude-code -a codex` copies each `skills/<name>/` directory into `~/.agents/skills/<name>/` (Codex reads it there) and symlinks `~/.claude/skills/<name>` to it (Claude Code reads it there). Nothing else in this repo reaches an agent: not this file, not `README.md`, not `scripts/`. A skill links only inside its own directory or to a sibling skill (`../<other-skill>/...`). Anything a skill needs at runtime lives under its own `references/`, `playbooks/` or `scripts/`.
+`npx skills add 10/pstack-t3 -g -a claude-code -a codex` copies each `skills/<name>/` directory into `~/.agents/skills/<name>/` (Codex reads it there) and symlinks `~/.claude/skills/<name>` to it (Claude Code reads it there). Nothing else in this repo reaches an agent: not this file, not `README.md`, not `scripts/`. A skill links only inside its own directory or to a sibling skill (`../<other-skill>/...`). Anything a skill needs at runtime lives under its own `references/`, `playbooks/` or `scripts/`.
 
 ## Harness facts
 
@@ -61,7 +61,7 @@ A skill that creates or finds skills covers both harnesses, because a T3 project
 A subagent is a `delegate_task` child. These defaults replace upstream's `Task` defaults.
 
 - **Spawn.** `delegate_task` with `mode: "async"`, a `title` that names the role and the slice, a `clientRequestId` that is stable across retries of one round and distinct per round, and `target` set from the role (see Model roles). Keep `runtimeMode` inherited. A read-only child gets "read-only: inspect only, no writes, no git commands" in its brief, not a weaker mode, so its MCP tools stay available.
-- **Briefs stand alone.** The child gets only the brief: the goal, absolute file pointers rather than inlined context, constraints, the report format, and whether it may delegate further ("Do not delegate" otherwise).
+- **Briefs stand alone.** Start every child or worktree thread with `Read <absolute poteto-mode directory>/worker.md before anything else.` The child gets only the brief: the goal, absolute file pointers rather than inlined context, constraints, the report format, and whether it may delegate further ("Do not delegate" otherwise).
 - **Wait.** An async child's completion wakes the parent with a notification. End the turn instead of polling. Use `task_status <taskId>` only when the result is needed mid-turn, and `task_cancel` to stop a child.
 - **Fresh by default.** A fix round, follow-up, retry or next queue item is a new `delegate_task` with consolidated scope: the original brief, every later directive, the prior report and branch. A `delegate_task` child is never resumed. Work that must keep state (a local checkout, uncommitted changes, a dev server, a simulator) runs in a `t3_thread_launch` thread instead. Follow up with `t3_thread_send`, wait with `t3_thread_wait`, read with `t3_thread_read`.
 - **Worktrees.** `delegate_task` children share the parent's checkout, so parallel writers there own disjoint files and run no git commands. A writer that needs its own tree is a `t3_thread_launch` thread with `workspaceStrategy: {"type":"worktree","baseRef":"<commit or branch>","branch":"<new branch>","startFromOrigin":false}`, the brief in `message`, and the role's model as `modelSelection: {"instanceId": "<providerInstanceId>", "model": "<model>", "options": {...}}` (note `instanceId`, not `providerInstanceId`). Commit first: uncommitted edits are not copied into a new worktree. One writer per worktree or branch.
@@ -78,17 +78,17 @@ interrogate reviewers: <entry>, <entry>, <entry>
 
 - An entry is `<providerInstanceId>/<model>` with an optional `(<effort>)`, validated against `orchestrator_capabilities`. A model with no effort option takes no `(<effort>)`. `inherit-parent` (or `auto`) runs the role on the parent thread's model: omit `target`.
 - Pass an entry as `target: {"providerInstanceId": ..., "model": ..., "options": {"<effort option id>": "<effort>"}}`. The effort option id is the one `orchestrator_capabilities` lists for that model (`effort` on Claude, `reasoningEffort` on Codex).
-- The effort ladder is `max` > `xhigh` > `high` > `medium` > `low`. Options outside it (`ultra`, `ultracode`, `ultrathink`) are never chosen by a budget.
-- A role with no line keeps the skill's default. With no file at all, single roles run `inherit-parent`, and a panel role takes the parent model plus the strongest model of each other provider that `orchestrator_capabilities` reports with `canRunChildTask`, up to three entries. Say so in the reply and suggest `/setup-pstack`.
-- Role names stay exactly as upstream: `feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`, `judgment and prose`, `hardest tasks`, `how explorer`, `how explainer`, `why investigators`, `why synthesizer`, `reflect tooling`, `reflect judgment, divergent, synthesizer`, `arena runners`, `arena cross-judge pool`, `swarm workers`, `architect runners`, `interrogate reviewers`.
+- The effort ladder is `xhigh` > `high` > `medium` > `low`. Options outside it (`max`, `ultra`, `ultracode`, `ultrathink`) are never chosen by a budget.
+- A role with no line keeps the skill's default. With no file at all, single roles run `inherit-parent`, and a panel role takes the parent model plus the strongest model from each other vendor that `orchestrator_capabilities` reports with `canRunChildTask`, up to three entries. Say so in the reply and suggest `/setup-pstack`.
+- Role names stay exactly as upstream: `feature, refactoring`, `bug-fix`, `perf-issue`, `hillclimb`, `judgment and prose`, `arena runners`, `arena cross-judge pool`, `swarm workers`, `interrogate reviewers`. Setup marks the file with `# defaults: 3` and confirms migrations from older budgets and role sets.
 
 ## Translation table
 
 | Cursor / upstream | T3 |
 |---|---|
 | `Task` tool, "spawn a subagent", `subagent_type`, `run_in_background: true` | `delegate_task` per Delegation. |
-| `subagent_type: "poteto-agent"`, `agents/poteto-agent.md` | The brief opens with the text of `poteto-mode/references/poteto-agent.md`, its `<poteto-mode SKILL.md>` placeholder replaced by the absolute path. Routed skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) keep the briefs they prescribe. |
-| `agents/comment-sicko.md` | `no-comments/references/comment-sicko.md`, pasted verbatim at the top of the child's brief. |
+| `subagent_type: "poteto-agent"`, `agents/poteto-agent.md` | After the worker.md kickoff line include the text of `poteto-mode/references/poteto-agent.md`, its `<poteto-mode SKILL.md>` placeholder replaced by the absolute path. Routed skills (`how`, `interrogate`, `swarm`) keep the briefs they prescribe. |
+| `agents/comment-sicko.md` | `no-comments/references/comment-sicko.md`, pasted verbatim after the worker.md kickoff line. |
 | `readonly: true`, "readonly strips MCP" | "read-only" in the brief. Mode stays inherited. |
 | Model slugs (`grok-*`, `claude-*-xhigh`, `gpt-*`), "default model X" | The role name ("your `bug-fix` model"), resolved per Model roles. |
 | `/setup-pstack` rule, `~/.cursor/rules/pstack-models.mdc`, `alwaysApply` | `~/.config/pstack/pstack-models.md`, read on demand. |
@@ -122,8 +122,7 @@ interrogate reviewers: <entry>, <entry>, <entry>
 
 - `watch-pr`: the one-shot GitHub merge verdict. No poll loop. `watch_pull_request` waits. A run reads GitHub once and prints the verdict last; `WAITING` (nothing to do until the next wake) exits 5.
 - `worktree-audit.sh`: `--activity <tsv>` supplies the last T3 activity per worktree, built from `t3_thread_list` plus `t3_thread_read` (`worktreePath`, latest run). T3 worktrees live in `~/.t3/worktrees/<project>/`.
-- `check-plan.mjs`: its required markers follow the ported `multi-phase-plan.md`.
-- `bootstrap.ts`, `package.json`, `bun.lock`: unchanged. Bun installs `commander` beside the scripts on first run.
+- `bootstrap.ts` and `bun.lock`: Bun installs `commander` beside the scripts on first run.
 
 `bun test` and `bun run typecheck` in `skills/poteto-mode/scripts` stay green.
 
