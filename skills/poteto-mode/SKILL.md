@@ -20,7 +20,7 @@ The remaining triggers live only here:
 - Starting any agent, whether a `delegate_task` child or a `t3_thread_launch` thread → the first line of its kickoff is `Read <path>/worker.md before anything else.`, with `<path>` the absolute path of this skill's folder. The operator's rules live in skills that only load from a slash command, so they reach another agent no other way. Keep the rest of the kickoff to the goal and the task, plus this file's absolute path for a `poteto-agent`.
 - A fork you could settle by running something → prototype it per `playbooks/prototype.md` instead of asking.
 - Code → name the data shape first. Across a function boundary → **architect**. Fan-out → **swarm**. Bakeoff → **arena**. Contested design → **interrogate**.
-- Prose, your reply included → **unslop**. Docs, PR descriptions, commit messages → **technical-writing**.
+- Prose, your reply included → **unslop-prose**. Docs, PR descriptions, commit messages → **technical-writing**.
 - Before commit → the bundled **deslop** skill. Before review → **no-comments**.
 - Shipping UI / IDE / CLI → the project's verification skill, or `preview_*` for web UIs, `device_*` for simulators, and the shell for CLIs and TUIs.
 - A number you measured → **benchmark-checklist**.
